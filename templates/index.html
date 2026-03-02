@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Workshop Check-In</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+    <main>
+        <div class="card" id="main-card">
+            <h1>Check In</h1>
+            <p class="subtitle">Enter your 7-Digit Code</p>
+            
+            <form id="checkin-form">
+                <div class="input-group">
+                    <input type="text" id="unique_code" name="unique_code" placeholder="0000000" maxlength="7" pattern="[A-Za-z0-9]{1,7}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required autofocus>
+                </div>
+                <button type="submit" class="btn-primary" id="submit-btn">Check In</button>
+            </form>
+            
+            <div id="feedback" class="feedback-box"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('checkin-form');
+            const input = document.getElementById('unique_code');
+            const feedback = document.getElementById('feedback');
+            const card = document.getElementById('main-card');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Haptic feedback (if supported by mobile browser)
+            const triggerHaptic = (type) => {
+                if ('vibrate' in navigator) {
+                    if (type === 'success') navigator.vibrate([50]); // Short vibration
+                    else if (type === 'error') navigator.vibrate([50, 100, 50]); // Double vibration
+                }
+            };
+
+            const showFeedback = (message, type) => {
+                feedback.textContent = message;
+                feedback.className = `feedback-box feedback-${type} show`;
+                
+                // Trigger animations
+                card.classList.remove('shake', 'pop'); // Reset
+                void card.offsetWidth; // Trigger reflow
+                
+                if (type === 'error' || type === 'warning') {
+                    card.classList.add('shake');
+                    triggerHaptic('error');
+                } else if (type === 'success') {
+                    card.classList.add('pop');
+                    triggerHaptic('success');
+                }
+                
+                // Optional: Auto-hide after 3 seconds for success
+                if(type === 'success') {
+                    setTimeout(() => {
+                         input.value = '';
+                         input.focus();
+                         feedback.classList.remove('show');
+                    }, 3000);
+                } else {
+                    input.focus();
+                    input.select();
+                }
+            };
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const code = input.value.trim();
+                
+                if (!code) {
+                    showFeedback('Please enter a code', 'error');
+                    return;
+                }
+
+                // Show loading state implicitly
+                input.disabled = true;
+                
+                try {
+                    const response = await fetch('/checkin', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: `unique_code=${encodeURIComponent(code)}`
+                    });
+                    
+                    const data = await response.json();
+                    showFeedback(data.message, data.type);
+                    
+                } catch (err) {
+                    showFeedback('Connection Error. Try again.', 'error');
+                } finally {
+                    input.disabled = false;
+                    if(feedback.classList.contains('feedback-error') || feedback.classList.contains('feedback-warning')) {
+                         input.focus();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

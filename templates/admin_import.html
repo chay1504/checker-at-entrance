@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Setup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main>
+        <div class="card">
+            <h1>Setup Workshop</h1>
+            <p class="subtitle">Import Participant Data</p>
+
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <form action="{{ url_for('admin_import') }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="file-upload-wrapper">
+                    <input type="file" name="file" id="file" accept=".xlsx" required>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">Requires columns: Name,
+                        Phone, College, Unique_Code</p>
+                </div>
+
+                <button type="submit" class="btn-primary">Import Excel Data</button>
+            </form>
+
+            <div style="margin-top: 20px;">
+                <a href="{{ url_for('admin_dashboard') }}"
+                    style="color: var(--blue-primary); text-decoration: none; font-size: 14px; font-weight: 500;">Skip
+                    to Dashboard</a>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

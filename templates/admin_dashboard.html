@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Optional FontAwesome link for icons -->
+</head>
+
+<body>
+    <main>
+        <div class="card" style="max-width: 500px;">
+            <h1>Dashboard</h1>
+            <p class="subtitle">Live Check-in Statistics</p>
+
+            <div class="dashboard-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="stats-registered">{{ total_registered }}</div>
+                    <div class="stat-label">Registered</div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-value" id="stats-attended" style="color: var(--success);">{{ total_attended }}
+                    </div>
+                    <div class="stat-label">Attended</div>
+                </div>
+            </div>
+
+            <div class="qr-container">
+                <img src="{{ url_for('generate_qr') }}" alt="Student Check-in Portal QR Code">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-top: 10px;">Scan to open Student Portal
+                </p>
+                <a href="{{ url_for('student_portal') }}" target="_blank"
+                    style="color: var(--blue-primary); text-decoration: none; font-size: 14px; font-weight: 500; display: block; margin-top: 8px;">Open
+                    Setup Portal</a>
+            </div>
+
+            <div class="admin-actions">
+                <a href="{{ url_for('admin_export') }}" class="btn-primary"
+                    style="text-decoration: none; text-align: center;">Export Attended List (.xlsx)</a>
+                <a href="{{ url_for('admin_import') }}" class="btn-secondary">Import New Data</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Set up live updating of statistics
+        function fetchLiveStats() {
+            fetch('{{ url_for("live_stats") }}')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('stats-registered').innerText = data.total_registered;
+                    document.getElementById('stats-attended').innerText = data.total_attended;
+                })
+                .catch(error => console.error('Error fetching live stats:', error));
+        }
+
+        // Poll every 3 seconds for live updates
+        setInterval(fetchLiveStats, 3000);
+    </script>
+</body>
+
+</html>
