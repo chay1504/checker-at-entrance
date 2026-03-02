@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import threading
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from functools import wraps
 from flask import Flask, render_template, request, jsonify, redirect, url_for, send_file, flash, session
 import pandas as pd
@@ -121,7 +121,8 @@ def checkin_api():
                 return jsonify({'success': False, 'message': 'Already Checked In', 'type': 'warning'})
             
             # Update to attended
-            current_time = datetime.now()
+            IST = timezone(timedelta(hours=5, minutes=30))
+            current_time = datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')
             cursor.execute(
                 "UPDATE attendees SET status = 'attended', check_in_time = ? WHERE id = ?", 
                 (current_time, attendee['id'])
@@ -258,7 +259,8 @@ def admin_export():
         
     output.seek(0)
     
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    IST = timezone(timedelta(hours=5, minutes=30))
+    timestamp = datetime.now(IST).strftime("%Y%m%d_%H%M%S")
     return send_file(
         output,
         download_name=f'attended_list_{timestamp}.xlsx',

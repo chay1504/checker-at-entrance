@@ -176,8 +176,22 @@
                             const timeSpan = document.createElement('span');
                             timeSpan.style.color = '#666';
                             timeSpan.style.fontSize = '0.95rem';
-                            const dt = new Date(r.check_in_time);
-                            timeSpan.innerText = dt.toLocaleTimeString();
+                            const rawDate = r.check_in_time;
+                            let timeString = rawDate;
+                            if (rawDate && rawDate.includes(' ')) {
+                                const timePart = rawDate.split(' ')[1];
+                                const parts = timePart.split(':');
+                                if (parts.length >= 2) {
+                                    let h = parseInt(parts[0], 10);
+                                    let m = parts[1];
+                                    let s = parts.length > 2 ? parts[2].split('.')[0] : '00';
+                                    const ampm = h >= 12 ? 'PM' : 'AM';
+                                    h = h % 12;
+                                    h = h ? h : 12;
+                                    timeString = `${h}:${m}:${s} ${ampm}`;
+                                }
+                            }
+                            timeSpan.innerText = timeString;
 
                             li.appendChild(nameSpan);
                             li.appendChild(timeSpan);
