@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Workshop Check-In</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .portal-card {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .portal-card h1 {
+            margin-bottom: 10px;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .portal-card h2 {
+            color: #666;
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .action-box {
+            padding: 30px 20px;
+            border-radius: 12px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .action-box:hover {
+            background: #fff;
+            border-color: #007aff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .action-box h3 {
+            margin-bottom: 10px;
+            color: #007aff;
+            font-size: 1.3rem;
+        }
+
+        .logout-link {
+            color: #dc3545;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body
+    style="background-color: #f5f5f7; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
+    <main style="width: 100%;">
+        <div class="portal-card">
+            <h1>Admin Portal</h1>
+            <h2>Current Workshop: <strong>{{ workshop_name }}</strong></h2>
+
+            <div class="action-grid">
+                <a href="{{ url_for('admin_import') }}" class="action-box">
+                    <h3>Create Setup</h3>
+                    <p style="font-size: 0.95rem; color: #666;">Setup a new workshop & upload list</p>
+                </a>
+
+                <a href="{{ url_for('admin_dashboard') }}" class="action-box">
+                    <h3>Dashboard</h3>
+                    <p style="font-size: 0.95rem; color: #666;">View live check-ins & export data</p>
+                </a>
+            </div>
+
+            <a href="{{ url_for('admin_logout') }}" class="logout-link">Log out</a>
+        </div>
+    </main>
+</body>
+
+</html>

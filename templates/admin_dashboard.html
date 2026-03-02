@@ -4,61 +4,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Dashboard - {{ workshop_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- Optional FontAwesome link for icons -->
+    <style>
+        .dashboard-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .recent-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .recent-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .qr-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            color: #007aff;
+            font-weight: 500;
+        }
+
+        .btn-action {
+            display: inline-block;
+            background: #007aff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            border: none;
+        }
+
+        .btn-secondary-action {
+            display: inline-block;
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
 </head>
 
-<body>
-    <main>
-        <div class="card" style="max-width: 500px;">
-            <h1>Dashboard</h1>
-            <p class="subtitle">Live Check-in Statistics</p>
+<body
+    style="background-color: #f5f5f7; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <div class="dashboard-container">
 
-            <div class="dashboard-grid">
-                <div class="stat-box">
-                    <div class="stat-value" id="stats-registered">{{ total_registered }}</div>
-                    <div class="stat-label">Registered</div>
-                </div>
-
-                <div class="stat-box">
-                    <div class="stat-value" id="stats-attended" style="color: var(--success);">{{ total_attended }}
-                    </div>
-                    <div class="stat-label">Attended</div>
-                </div>
+        <div class="header-section">
+            <div>
+                <h1 style="margin: 0; font-size: 1.8rem; color: #333;">Dashboard</h1>
+                <p style="margin: 5px 0 0 0; color: #666; font-size: 1rem;">Workshop: <strong>{{ workshop_name
+                        }}</strong></p>
             </div>
-
-            <div class="qr-container">
-                <img src="{{ url_for('generate_qr') }}" alt="Student Check-in Portal QR Code">
-                <p style="font-size: 13px; color: var(--text-secondary); margin-top: 10px;">Scan to open Student Portal
-                </p>
-                <a href="{{ url_for('student_portal') }}" target="_blank"
-                    style="color: var(--blue-primary); text-decoration: none; font-size: 14px; font-weight: 500; display: block; margin-top: 8px;">Open
-                    Setup Portal</a>
-            </div>
-
-            <div class="admin-actions">
-                <a href="{{ url_for('admin_export') }}" class="btn-primary"
-                    style="text-decoration: none; text-align: center;">Export Attended List (.xlsx)</a>
-                <a href="{{ url_for('admin_import') }}" class="btn-secondary">Import New Data</a>
+            <div>
+                <a href="{{ url_for('main_portal') }}" class="btn-secondary-action"
+                    style="margin-right: 10px;">Portal</a>
+                <a href="{{ url_for('admin_export') }}" class="btn-action">Export Data</a>
             </div>
         </div>
-    </main>
+
+        <div class="dashboard-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="stats-registered" style="font-size: 3.5rem; font-weight: 700; color: #333;">
+                    {{ total_registered }}</div>
+                <div class="stat-label" style="color: #666; font-size: 1.1rem; margin-top: 10px;">Total Registrations
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-value" id="stats-attended"
+                    style="font-size: 3.5rem; font-weight: 700; color: #28a745;">{{ total_attended }}</div>
+                <div class="stat-label" style="color: #666; font-size: 1.1rem; margin-top: 10px;">Total Attended</div>
+            </div>
+        </div>
+
+        <div class="recent-box">
+            <h2 style="margin-top: 0; color: #333; font-size: 1.3rem; margin-bottom: 20px;">Recent Check-ins</h2>
+            <ul class="recent-list" id="recent-list">
+                <li style="color: #999; text-align: center; padding: 20px;">Waiting for attendees...</li>
+            </ul>
+        </div>
+
+        <div class="qr-section">
+            <h2 style="margin-top: 0; color: #333; font-size: 1.3rem;">Check-in Portal QR Code</h2>
+            <p style="color: #666; margin-bottom: 20px;">Scan to open the student check-in device.</p>
+            <img src="{{ url_for('generate_qr') }}" alt="Student Check-in Portal QR Code"
+                style="max-width: 200px; display: block; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+            <a href="{{ url_for('student_portal') }}" target="_blank" class="btn-link"
+                style="display: block; margin-top: 20px; font-size: 1.1rem;">Open Setup Portal Directly</a>
+        </div>
+    </div>
 
     <script>
-        // Set up live updating of statistics
         function fetchLiveStats() {
             fetch('{{ url_for("live_stats") }}')
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('stats-registered').innerText = data.total_registered;
                     document.getElementById('stats-attended').innerText = data.total_attended;
+
+                    const listContainer = document.getElementById('recent-list');
+                    if (data.recent && data.recent.length > 0) {
+                        listContainer.innerHTML = '';
+                        data.recent.forEach(r => {
+                            const li = document.createElement('li');
+                            li.className = 'recent-item';
+
+                            const nameSpan = document.createElement('span');
+                            nameSpan.style.fontWeight = '600';
+                            nameSpan.style.color = '#333';
+                            nameSpan.style.fontSize = '1.1rem';
+                            nameSpan.innerText = r.name + ' (' + r.phone + ')';
+
+                            const timeSpan = document.createElement('span');
+                            timeSpan.style.color = '#666';
+                            timeSpan.style.fontSize = '0.95rem';
+                            const dt = new Date(r.check_in_time);
+                            timeSpan.innerText = dt.toLocaleTimeString();
+
+                            li.appendChild(nameSpan);
+                            li.appendChild(timeSpan);
+                            listContainer.appendChild(li);
+                        });
+                    }
                 })
                 .catch(error => console.error('Error fetching live stats:', error));
         }
 
-        // Poll every 3 seconds for live updates
         setInterval(fetchLiveStats, 3000);
+        fetchLiveStats(); // Execute immediately once
     </script>
 </body>
 
